@@ -69,18 +69,18 @@ _Z16CARGAR_ARREGLO_2PA2_A2_A4_C:
 //       En su lugar usa la operacion SALL (Shift Arithmetic Left) que respeta el bit del signo (complemento-2).
 
 	MOVL	  -4(%RBP), %EAX    <-- j
-	SALL    $4, %EAX          <-- (j*dimension2*dimension3*dimension4)
-	MOVSLQ	%EAX, %RDX
+	SALL      $4, %EAX          <-- (j*dimension2*dimension3*dimension4)
+	MOVSLQ	  %EAX, %RDX
 	MOVL	  -8(%RBP), %EAX    <-- z
 	SALL	  $3, %EAX          <-- (z*dimension3*dimension4)
-	CLTQ                      <-- convierte el contenido del registro AX de double-word a quad-word
+	CLTQ                        <-- convierte el contenido del registro AX de double-word a quad-word
 	ADDQ	  %RAX, %RDX        <-- (j*dimension2*dimension3*dimension4) + (z*dimension3*dimension4)
 	MOVL	  -12(%RBP), %EAX   <-- y
 	SALL	  $2, %EAX          <-- (y*dimension4)
-	CLTQ                      <-- convierte el contenido del registro AX de double-word a quad-word
+	CLTQ                        <-- convierte el contenido del registro AX de double-word a quad-word
 	ADDQ	  %RAX, %RDX        <-- (j*dimension2*dimension3*dimension4) + (z*dimension3*dimension4) + (y*dimension4)
 	MOVL	  -16(%RBP), %EAX   <-- x
-	CLTQ                      <-- convierte el contenido del registro AX de double-word a quad-word
+	CLTQ                        <-- convierte el contenido del registro AX de double-word a quad-word
 	ADDQ	  %RAX, %RDX        <-- (j*dimension2*dimension3*dimension4) + (z*dimension3*dimension4) + (y*dimension4) + x
 	MOVQ	  -24(%RBP), %RAX   <-- base
 	ADDQ	  %RDX, %RAX        <-- base + (j*dimension2*dimension3*dimension4) + (z*dimension3*dimension4) + (y*dimension4) + x
