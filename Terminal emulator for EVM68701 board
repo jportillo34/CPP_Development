@@ -1,0 +1,293 @@
+#include  <estandar.h>
+#include  <stdlib.h>
+#include  <stdio.h>
+#include  <conio.h>
+
+
+
+void main()
+{
+   void modulo_de_evaluacion_68701();
+
+
+   printf("\n  EMULADOR DE TERMINAL PARA EVM68701................Version 1.2");
+   printf("\n  Departamento de Investigacion y Desarrollo  XXXXXXXXXXXXX c.a.\n");
+   modulo_de_evaluacion_68701();
+}
+
+
+
+void modulo_de_evaluacion_68701()
+{
+   char  caracter = 0x00,
+	      token_command[20] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+   unsigned  pos = 0;
+   char  mayuscula_del_caracter();
+   char  recibe_dato();
+   void transmite_dato(char );
+	void muestrea_el_puerto();
+	int reconocedor(char *);
+	int transmite_programas();
+
+
+	do {
+		if(kbhit()) {
+			token_command[pos] = caracter = mayuscula_del_caracter();
+			if(caracter != 0x1b) {
+				if(caracter == 0x3b) muestrea_el_puerto(); else {
+					transmite_dato(caracter);
+					if((caracter != 0x0d) &&
+                  (caracter != 0x18) && (caracter != 0x2e)) {
+						((caracter == 0x08) && (pos > 0)) ? pos-- : pos++;
+					}
+				}
+			}
+	   }
+		if(caracter != 0x1b) {
+         caracter = recibe_dato();
+			if((caracter != 0x00) && (caracter != 0x18)) putchar(caracter);
+			if((token_command[pos] == 0x0d) && (pos > 0)) {
+				if(reconocedor(token_command)) transmite_programas();
+				for(pos = 0;pos <= 19;pos++) token_command[pos] = 0x00;
+				pos = 0;
+			}
+		}
+	}while(caracter != 0x1b);
+}
+
+
+
+char recibe_dato()
+{
+	asm  MOV  DX,0x03fd
+	asm  IN   AL,DX
+	asm  AND  AL,0x01
+	asm  JZ   SHORT no_data
+	asm  SUB  DX,5
+	asm  IN   AL,DX
+	asm  JMP  SHORT ext
+no_data:
+	asm  XOR  AL,AL
+ext:
+	asm  XOR  AH,AH
+	return _AL;
+}
+
+
+
+void transmite_dato(char caracter)
+{
+	asm  MOV  DX,0x03f8
+	asm  MOV  AL,caracter
+	asm  OUT  DX,AL
+	asm  MOV  DX,0x03fd
+ciclo:
+	asm  IN   AL,DX
+	asm  AND  AL,0x20
+	asm  JZ   SHORT ciclo
+}
+
+
+
+void muestrea_el_puerto()
+{
+	char  *tabla1="ÚÄÄ PUERTO ÄÄ¿",
+			*tabla2="³            ³",
+			*tabla3="³            ³",
+			*tabla4="³            ³",
+			*tabla5="³            ³",
+			*tabla6="³            ³",
+			*tabla7="³            ³",
+			*tabla8="ÀÄÄÄÄÄÄÄÄÄÄÄÄÙ",
+			cifra[10];
+	unsigned char
+					 buffer[6] = {0x20,0x20,0x20,0x20,0x20,0x20},
+					 hexade[16] = {0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,
+                              0x38,0x39,0x41,0x42,0x43,0x44,0x45,0x46},
+					 palabra,
+					 palabra_2,
+					 caracter[3];
+	int    indice=0,
+			 i;
+	unsigned long lecturas = 0;
+	FILE  *archivo_buffer;
+
+
+	archivo_buffer = fopen("EVM68.DAT","w");
+	asm MOV  AX,0x0083
+	asm MOV  DX,1
+	asm INT  0x14
+	video_tipo();
+	v_save(1,60,8,73);
+	despliegue(1,60,8,73,0x1F00,0,0,1);
+	v_write(1,60,tabla1,0x1F);
+	v_write(2,60,tabla2,0x1F);
+	v_write(3,60,tabla3,0x1F);
+	v_write(4,60,tabla4,0x1F);
+	v_write(5,60,tabla5,0x1F);
+	v_write(6,60,tabla6,0x1F);
+	v_write(7,60,tabla7,0x1F);
+	v_write(8,60,tabla8,0x1F);
+SALIDA00:
+	while(keypressed() != 0x1B)
+	{
+		asm MOV  DX,0x02F8
+		asm ADD  DX,5
+		asm IN   AL,DX
+		asm AND  AL,0x01
+		asm JZ   SALIDA00
+		asm SUB  DX,5
+		asm IN   AL,DX
+		asm MOV  palabra,AL
+		asm MOV  AX,indice
+		asm CMP  AX,5
+		asm JBE  SHORT NOSCROLL
+		for(i = 0;i < 5;i++)
+		{
+			buffer[i] = buffer[i+1];
+		}
+		indice = i;
+NOSCROLL:
+		buffer[indice] = palabra;
+		if(lecturas < 102400)
+		{
+			ultoa(lecturas,cifra,10);
+			for(i = 0;cifra[i] != '\0';i++)
+			{
+				fputc(cifra[i],archivo_buffer);
+			}
+			fputc(',',archivo_buffer);
+			palabra_2 = (palabra & 0xF0) >> 4;
+			if((palabra_2 >= 0x0A) && (palabra_2 <= 0x0F))
+			{
+				palabra_2 = 0x46 - (0x0F-palabra_2);
+			}
+			else
+			{
+				palabra_2 |= 0x30;
+			}
+			fputc(palabra_2,archivo_buffer);
+			palabra_2 = palabra & 0x0F;
+			if((palabra_2 >= 0x0A) && (palabra_2 <= 0x0F))
+			{
+				palabra_2 = 0x46 - (0x0F-palabra_2);
+			}
+			else
+			{
+				palabra_2 |= 0x30;
+			}
+			fputc(palabra_2,archivo_buffer);
+			fputc('\n',archivo_buffer);
+			lecturas++;
+		}
+		indice++;
+		for(i = 0;i <= indice-1;i++)
+		{
+			palabra = (buffer[i]&0xF0) >> 4;
+			caracter[0] = hexade[palabra];
+			palabra = buffer[i] & 0x0F;
+			caracter[1] = hexade[palabra];
+			caracter[2] = '\0';
+			v_write(i+2,66,caracter,0x1F);
+		}
+	}
+	v_load(1,60,8,73);
+	if(lecturas == 0)
+	{
+		remove("EVM68.DAT");
+	}
+	else
+	{
+		fclose(archivo_buffer);
+	}
+}
+
+
+
+char mayuscula_del_caracter()
+{
+	char  caracter_convertido;
+
+
+	caracter_convertido = getch();
+	if((caracter_convertido >= 0x61) && (caracter_convertido <= 0x7A))
+	{
+		caracter_convertido -= 0x20;
+	}
+	return caracter_convertido;
+}
+
+
+
+int reconocedor(char *linea)
+{
+	char  *load_command = "LOADT";
+	unsigned  indice_linea,
+				 indice_load,
+				 igualdad;
+
+
+	for(indice_linea = igualdad = indice_load = 0;linea[indice_linea] != 0x0D;
+		 indice_linea++)
+	{
+		if(linea[indice_linea] == load_command[indice_load])
+		{
+			igualdad++;
+			if(linea[indice_linea] != 0x20)
+			{
+				indice_load++;
+			}
+		}
+	}
+	return (igualdad == 5) ? 1 : 0;
+}
+
+
+
+transmite_programas()
+{
+	int   indice=0;
+	char  caracter,
+			*directorio="DIR/W *.S19",
+			*nombre_del_archivo;
+	FILE  *programa;
+
+
+	printf("\n");
+	system(directorio);
+	printf("\nNombre del programa:");
+	gets(nombre_del_archivo);
+	while((nombre_del_archivo[indice] != '.') &&
+			(nombre_del_archivo[indice] != '\0'))
+	{
+		indice++;
+	}
+	if(nombre_del_archivo[indice] == '\0')
+	{
+		nombre_del_archivo[indice] = '.';
+	}
+	nombre_del_archivo[indice+1] = 'S';
+	nombre_del_archivo[indice+2] = '1';
+	nombre_del_archivo[indice+3] = '9';
+	if(!(programa = fopen(nombre_del_archivo,"r")))
+	{
+		return 0;
+	}
+	while((caracter = fgetc(programa)) != EOF)
+	{
+		if((caracter != 0x0D) && (caracter != 0x0A))
+		{
+			transmite_dato(caracter);
+			caracter = recibe_dato();
+			if(caracter == 'S')
+			{
+				printf("\n");
+			}
+			putchar(caracter);
+		}
+	}
+	fclose(programa);
+	return 1;
+}
+
+asm   db 'Autor del Programa Jose R. Portillo L. 1992'
