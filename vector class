@@ -1,0 +1,102 @@
+/* ---------------------------------------------------------------------------- *
+ * Ejemplo de Clase con sus constructores, miembros y sobrecarga de operadores. *
+ * Se crea una clase de vector 2-dimensional (como un par ordenado) y equipado  *
+ * con dos operaciones basicas: adicion de vectores y producto de un vector por *
+ * un escalar.                                                                  *
+ *                                                                              *
+ * NOTA: Al usar la sobrecarga de operadores es importante que, al momento de   *
+ *       realizar alguna sentancia que involucre dicho operador, el primer      *
+ *       operando de la expresion DEBE ser de la misma clase que el objeto.     *
+ *       Ejemplo, suponiendo que hacemos un producto escalar por un vector, la  *
+ *       siguiente sentencia producira un error de compilacion:                 *
+ *                                                                              *
+ *       vector = 3 * vector;                                                   *
+ *                                                                              *
+ *       Esto se debe a que el compilador analiza la sentencia de izquierda a   *
+ *       derecha y, al encontrar un elemento distinto al tipo del objeto (en el *
+ *       lado izquierdo a la igualdad), indicara que no son del mismo tipo.     *
+ *       Lo correcto es colocar primero el operando del mismo tipo del resultado*
+ *                                                                              *
+ *       vector = vector * 3;                                                   *
+ * ---------------------------------------------------------------------------- */
+ #include<iostream>
+ 
+ using namespace std;
+ 
+ /* --------------------------------------------------------------- *
+ * Vector 2-dimensional                                            *
+ *                                                                 *
+ * Cumple con las reglas de suma de vectores y producto escalar,   *
+ * (x1,y1) + (x2,y2) = (x1+x2,y1+y2)                               *
+ * c(x1,x2) = (cx1,cx2)                                            *
+ *                                                                 *
+ * Tambien aplican las propiedades del algebra vectorial,          *
+ * α + β = β + α , α + (β + ϒ) = (α + β) + ϒ                       *
+ * c(α + β) = cα + cβ , 1α = α                                     *
+ * --------------------------------------------------------------- */
+class parOr
+{
+	private:
+		// Atributos.
+		int dummx;   // Atributos dummy para la suma de vectores. Evitan que las componentes del vector sean alteradas.
+		int dummy;
+		int x;       // Componente x.
+		int y;       // Componente y.
+	public:
+		// Constructores.
+		parOr() : x(0), y(0), dummx(0), dummy(0) {}                          // Usado cuando no se especifican parametros.
+		parOr(int inix, int iniy) : x(inix), y(iniy), dummx(0), dummy(0) {}  // Usado cuando se especifican parametros.
+
+		// Funciones miembro.
+		void setPar(int valx, int valy) { x = valx; y = valy; }                   // Nuevos valores para las componentes.
+		void showPar() { cout << "(x,y) = (" << x << "," << y << ")" << endl; }   // Muestra el par ordenado.
+
+		// Suma de vectores y producto de un escalar por un vector.
+    	parOr operator + (parOr oper) { dummx = x + oper.x; dummy = y + oper.y; return(parOr(dummx, dummy)); }
+    	parOr operator * (int scalar) { x *= scalar; y *= scalar; return(parOr(x, y)); }
+};
+
+
+int main()
+{
+	parOr vec1;
+	parOr vec2(2, 3);
+	parOr vec3(5, 5);
+	parOr vec4(8, 4);
+
+	cout << "Al inicio:" << endl << "---------" << endl; 
+	cout << "vec1 ---> "; vec1.showPar(); cout << endl; 
+	cout << "vec2 ---> "; vec2.showPar(); cout << endl;
+	cout << "vec3 ---> "; vec3.showPar(); cout << endl;
+
+		vec1 = (vec4 + vec2) + vec3;
+
+	cout << "Luego de vec1 = vec2 + vec3: " << endl << "---------------------------" << endl; 
+	cout << "vec1 ---> "; vec1.showPar(); cout << endl; 
+	cout << "vec2 ---> "; vec2.showPar(); cout << endl;
+	cout << "vec3 ---> "; vec3.showPar(); cout << endl;
+	cout << "vec4 ---> "; vec4.showPar(); cout << endl;
+
+	vec3 = vec3 * 1;
+
+	cout << "Luego de vec3 = 3 * vec3: " << endl << "---------------------------" << endl; 
+	cout << "vec1 ---> "; vec1.showPar(); cout << endl; 
+	cout << "vec2 ---> "; vec2.showPar(); cout << endl;
+	cout << "vec3 ---> "; vec3.showPar(); cout << endl;
+
+	vec1 = vec2 + vec3;
+
+	cout << "Luego de vec1 = vec2 + vec3: " << endl << "---------------------------" << endl; 
+	cout << "vec1 ---> "; vec1.showPar(); cout << endl; 
+	cout << "vec2 ---> "; vec2.showPar(); cout << endl;
+	cout << "vec3 ---> "; vec3.showPar(); cout << endl;
+
+	vec2 = vec2 + vec3;
+
+	cout << "Luego de vec2 = vec2 + vec3: " << endl << "---------------------------" << endl; 
+	cout << "vec1 ---> "; vec1.showPar(); cout << endl; 
+	cout << "vec2 ---> "; vec2.showPar(); cout << endl;
+	cout << "vec3 ---> "; vec3.showPar(); cout << endl;
+
+  return(0);
+}
