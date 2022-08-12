@@ -65,7 +65,7 @@ void main()
 
 
    printf("[]-------Programa para lectura de Codigo de Barras-------[]\n");
-   printf("Desarrollado por el Departamento de Investigacion de Tecnosiglo c.a.\n");
+   printf("Desarrollado por el Departamento de Investigacion de XXXXXXX c.a.\n");
    printf("Acciones:  tecla 'c'   --> iniciar comparaciones\n");
    printf("           tecla 'Esc' --> finalizar\n\n");
    for(indice_util = 0;indice_util < TOPE;indice_util++)
