@@ -1,0 +1,46 @@
+ccb01.exe:
+   #[]-------------------------------------------------[]
+   #  Copia los archivos en el directorio de generacion
+   #[]-------------------------------------------------[]
+   copy b:\masm60\filelib.asm c:\borlandc\bin
+   copy b:\masm60\vdlib.asm c:\borlandc\bin
+   copy b:\borlandc\combuzon.cpp c:\borlandc\bin
+   copy b:\borlandc\str_oper.cpp c:\borlandc\bin
+   copy b:\borlandc\ventana.cpp c:\borlandc\bin
+   copy b:\borlandc\entrada.cpp c:\borlandc\bin
+   copy b:\borlandc\calcm.cpp c:\borlandc\bin
+   copy b:\borlandc\ifkey.cpp c:\borlandc\bin
+   copy b:\borlandc\date.cpp c:\borlandc\bin
+   copy b:\borlandc\ccb01.cpp c:\borlandc\bin
+   copy b:\borlandc\buzon.h c:\borlandc\include
+   copy b:\borlandc\estandar.h c:\borlandc\include
+   #[]-------------------------------------------------[]
+   #  Compila todos los modulos necesarios para generar
+   #  la libreria ESTANDAR.LIB...
+   #[]-------------------------------------------------[]
+   ml  /c filelib.asm
+   ml  /c vdlib.asm
+   bcc -c combuzon
+   bcc -c str_oper
+   bcc -c ventana
+   bcc -c entrada
+   bcc -c calcm
+   bcc -c ifkey
+   bcc -c date
+   #[]--------------------------------------------------[]
+   #  Combina los modulos en la libreria ESTANDAR.LIB...
+   #[]--------------------------------------------------[]
+   del  c:\borlandc\lib\estandar.*
+   tlib c:\borlandc\lib\estandar +combuzon
+   tlib c:\borlandc\lib\estandar +str_oper
+   tlib c:\borlandc\lib\estandar +filelib
+   tlib c:\borlandc\lib\estandar +ventana
+   tlib c:\borlandc\lib\estandar +entrada
+   tlib c:\borlandc\lib\estandar +calcm
+   tlib c:\borlandc\lib\estandar +ifkey
+   tlib c:\borlandc\lib\estandar +vdlib
+   tlib c:\borlandc\lib\estandar +date
+   #[]-----------------------------------------------------------[]
+   #  Genera el modulo ejecutable del programa Buzon CCB01.EXE...
+   #[]-----------------------------------------------------------[]
+   bcc -C ccb01 estandar.lib
